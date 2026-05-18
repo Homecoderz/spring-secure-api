@@ -43,8 +43,7 @@ public class UserController {
 
     @GetMapping("/{user_id}")
     public ResponseEntity<UserResponseDTO> retrieveUserById(@PathVariable int user_id) {
-        return userService.findById(user_id)
-                .map(user -> ResponseEntity.ok(userMapper.toDTO(user))).orElseGet(() -> ResponseEntity.notFound().build());
+        return userService.findById(user_id).map(userMapper::toDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/register")

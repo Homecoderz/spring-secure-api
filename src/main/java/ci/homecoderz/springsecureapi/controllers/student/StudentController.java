@@ -9,6 +9,7 @@ import ci.homecoderz.springsecureapi.services.student.StudentService;
 import ci.homecoderz.springsecureapi.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ public class StudentController {
     }
 
     @GetMapping("/{student_id}")
-    public StudentDTO getStudentById(@PathVariable int student_id) {
-        return studentMapper.toDTO(studentService.retrieveById(student_id));
+    public ResponseEntity <StudentDTO> getStudentById(@PathVariable int student_id) {
+        return studentService.retrieveById(student_id);
     }
 
     @PostMapping("/add")
