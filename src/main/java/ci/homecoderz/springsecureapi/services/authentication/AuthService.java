@@ -1,6 +1,6 @@
 package ci.homecoderz.springsecureapi.services.authentication;
 
-import ci.homecoderz.springsecureapi.entities.dto.CredentialDTO;
+import ci.homecoderz.springsecureapi.entities.dto.UserLoginDTO;
 import ci.homecoderz.springsecureapi.entities.user.User;
 import ci.homecoderz.springsecureapi.repositories.UserRepository;
 
@@ -20,7 +20,7 @@ public class AuthService {
     private final UserRepository userRepository;
 
 
-    public String authenticate(CredentialDTO credentialDTO) {
+    public String authenticate(@org.jetbrains.annotations.UnknownNullability UserLoginDTO credentialDTO) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentialDTO.getPrincipal().trim(), credentialDTO.getPassword().trim()));
         if(authentication.isAuthenticated()) {
             User authenticated_user = userRepository.findByUsername(credentialDTO.getPrincipal());
