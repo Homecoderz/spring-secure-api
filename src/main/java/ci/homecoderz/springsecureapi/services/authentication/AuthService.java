@@ -10,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +22,10 @@ public class AuthService {
     private final UserRepository userRepository;
 
 
-    public String authenticate(@org.jetbrains.annotations.UnknownNullability UserLoginDTO credentialDTO) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentialDTO.getPrincipal().trim(), credentialDTO.getPassword().trim()));
+    public String authenticate(UserLoginDTO userLoginDTO) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername().trim(), userLoginDTO.getPassword().trim()));
         if(authentication.isAuthenticated()) {
-            User authenticated_user = userRepository.findByUsername(credentialDTO.getPrincipal());
+            Optional<User> authenticated_user = userRepository.findByUsername(userLoginDTO.getUsername().trim());
             return jwtService.generateToken(authenticated_user);
         }
         return "Aucun utilisateur trouvé";

@@ -24,7 +24,7 @@ public class UserService {
         return userRepository.findById(teacher_id);
     }
 
-    public User findByUsername(String username) {
+    public Optional <User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
@@ -33,8 +33,13 @@ public class UserService {
     }
 
     public User store(UserRegistrationDTO userRegistrationDTO) {
-        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
-        return userRepository.save(userMapper.toEntity(userRegistrationDTO));
+
+        User user = userMapper.toEntity(userRegistrationDTO);
+        user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        user.setRole("USER");
+        user.setEnabled(true);
+
+        return userRepository.save(user);
     }
 
 

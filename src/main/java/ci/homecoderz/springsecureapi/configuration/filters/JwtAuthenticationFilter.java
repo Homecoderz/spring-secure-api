@@ -2,6 +2,7 @@ package ci.homecoderz.springsecureapi.configuration.filters;
 
 import ci.homecoderz.springsecureapi.services.authentication.JwtService;
 import ci.homecoderz.springsecureapi.services.user.CustomUserDetailsService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,23 +37,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String jwtToken = authorizationHeader.substring(7);
-        final String username = jwtService.extractUsername(jwtToken);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            final String jwtToken = authorizationHeader.substring(7);
+            final String username = jwtService.extractUsername(jwtToken);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // S'il y a un (username) et que l'utilisateur n'est pas authentifié
-        if (username != null && authentication == null) {
+            if (username != null && authentication == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            // Si le jwtToken est valid
-            if (jwtService.isTokenValid(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+
+        } catch (JwtException | IllegalArgumentException exception) {
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalide ou expiré");
+        }
     }
 }
