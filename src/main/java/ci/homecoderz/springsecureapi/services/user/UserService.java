@@ -1,5 +1,6 @@
 package ci.homecoderz.springsecureapi.services.user;
-import ci.homecoderz.springsecureapi.entities.dto.UserDTO;
+import ci.homecoderz.springsecureapi.entities.dto.UserRegistrationDTO;
+import ci.homecoderz.springsecureapi.entities.dto.UserResponseDTO;
 import ci.homecoderz.springsecureapi.entities.mapper.UserMapper;
 import ci.homecoderz.springsecureapi.entities.user.User;
 import ci.homecoderz.springsecureapi.repositories.UserRepository;
@@ -31,9 +32,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User store(UserDTO userDTO) {
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        return userRepository.save(userMapper.toEntity(userDTO));
+    public User store(UserRegistrationDTO userRegistrationDTO) {
+        userRegistrationDTO.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        return userRepository.save(userMapper.toEntity(userRegistrationDTO));
     }
 
 

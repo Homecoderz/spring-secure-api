@@ -1,7 +1,8 @@
 package ci.homecoderz.springsecureapi.controllers.user;
 
-import ci.homecoderz.springsecureapi.entities.dto.CredentialDTO;
-import ci.homecoderz.springsecureapi.entities.dto.UserDTO;
+import ci.homecoderz.springsecureapi.entities.dto.UserLoginDTO;
+import ci.homecoderz.springsecureapi.entities.dto.UserRegistrationDTO;
+import ci.homecoderz.springsecureapi.entities.dto.UserResponseDTO;
 import ci.homecoderz.springsecureapi.entities.mapper.UserMapper;
 import ci.homecoderz.springsecureapi.entities.user.User;
 import ci.homecoderz.springsecureapi.services.authentication.AuthService;
@@ -26,12 +27,12 @@ public class UserController {
 
 
     @GetMapping
-    public List<UserDTO> findAllUsers() {
+    public List<UserResponseDTO> findAllUsers() {
         return userService.findAll().stream().map(userMapper::toDTO).toList();
     }
 
     @GetMapping("/retrieve/{username}")
-    public ResponseEntity<UserDTO> retrieveUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserResponseDTO> retrieveUserByUsername(@PathVariable String username) {
         User user = userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -41,45 +42,45 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}")
-    public ResponseEntity<UserDTO> retrieveUserById(@PathVariable int user_id) {
+    public ResponseEntity<UserResponseDTO> retrieveUserById(@PathVariable int user_id) {
         return userService.findById(user_id)
                 .map(user -> ResponseEntity.ok(userMapper.toDTO(user))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) {
-        if (!isValidRegistrationRequest(userDTO)) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegistrationDTO userRegistrationDTO) {
+        if (!isValidRegistrationRequest(userRegistrationDTO)) {
             return ResponseEntity.badRequest().build();
         }
 
-        UserDTO createdUser = userMapper.toDTO(userService.store(userDTO));
+        UserResponseDTO createdUser = userMapper.toDTO(userService.store(userRegistrationDTO));
         URI location = URI.create("/user/" + createdUser.getId());
         return ResponseEntity.created(location).body(createdUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody CredentialDTO credentialDTO) {
-        if (!isValidLoginRequest(credentialDTO)) {
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+        if (!isValidLoginRequest(userLoginDTO)) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            return ResponseEntity.ok(authService.authenticate(credentialDTO));
+            return ResponseEntity.ok(authService.authenticate(userLoginDTO));
         } catch (AuthenticationException exception) {
             return ResponseEntity.status(401).build();
         }
     }
 
-    private boolean isValidRegistrationRequest(UserDTO userDTO) {
-        return userDTO != null
-                && StringUtils.hasText(userDTO.getUsername())
-                && StringUtils.hasText(userDTO.getPassword())
-                && StringUtils.hasText(userDTO.getEmail());
+    private boolean isValidRegistrationRequest(UserRegistrationDTO userRegistrationDTO) {
+        return userRegistrationDTO != null
+                && StringUtils.hasText(userRegistrationDTO.getUsername())
+                && StringUtils.hasText(userRegistrationDTO.getPassword())
+                && StringUtils.hasText(userRegistrationDTO.getEmail());
     }
 
-    private boolean isValidLoginRequest(CredentialDTO credentialDTO) {
-        return credentialDTO != null
-                && StringUtils.hasText(credentialDTO.getPrincipal())
-                && StringUtils.hasText(credentialDTO.getPassword());
+    private boolean isValidLoginRequest(UserLoginDTO userLoginDTO) {
+        return userLoginDTO != null
+                && StringUtils.hasText(userLoginDTO.getUsername())
+                && StringUtils.hasText(userLoginDTO.getPassword());
     }
 }
