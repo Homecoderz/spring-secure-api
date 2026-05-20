@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorDTO> handleAuthentication(AuthenticationException exception) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorDTO.of("Authentification échouée.", 401));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorDTO.of(exception.getMessage(), 401));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
