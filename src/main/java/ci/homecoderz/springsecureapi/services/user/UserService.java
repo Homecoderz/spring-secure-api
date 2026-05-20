@@ -1,8 +1,8 @@
 package ci.homecoderz.springsecureapi.services.user;
 import ci.homecoderz.springsecureapi.entities.dto.UserRegistrationDTO;
-import ci.homecoderz.springsecureapi.entities.dto.UserResponseDTO;
 import ci.homecoderz.springsecureapi.entities.mapper.UserMapper;
 import ci.homecoderz.springsecureapi.entities.user.User;
+import jakarta.persistence.EntityNotFoundException;
 import ci.homecoderz.springsecureapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,8 +24,18 @@ public class UserService {
         return userRepository.findById(teacher_id);
     }
 
-    public Optional <User> findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public User findByIdOrThrow(Integer userId) {
+        return findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+    }
+
+    public User findByUsernameOrThrow(String username) {
+        return findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
     }
 
     public List<User> findAll() {

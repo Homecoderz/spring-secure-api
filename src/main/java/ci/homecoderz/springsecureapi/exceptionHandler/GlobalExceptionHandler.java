@@ -2,6 +2,7 @@ package ci.homecoderz.springsecureapi.exceptionHandler;
 
 import ci.homecoderz.springsecureapi.entities.dto.ErrorDTO;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -20,11 +21,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorDTO> handleAuthentication(AuthenticationException exception) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorDTO.of("Authentification échouée.", 401));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorDTO.of("Authentification échouée.", 401));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDTO> handleValidation(MethodArgumentNotValidException exception) {
-        return ResponseEntity.badRequest().body(ErrorDTO.of("Requête invalide", 400));
+        String message = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .orElse("Requête invalide");
+
+        return ResponseEntity.badRequest()
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(ErrorDTO.of(message, 400));
     }
 }

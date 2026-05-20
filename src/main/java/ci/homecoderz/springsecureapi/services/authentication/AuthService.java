@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class AuthService {
     public String authenticate(UserLoginDTO userLoginDTO) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername().trim(), userLoginDTO.getPassword().trim()));
         if(authentication.isAuthenticated()) {
-            Optional<User> authenticated_user = userRepository.findByUsername(userLoginDTO.getUsername().trim());
+            User authenticated_user = userRepository.findByUsername(userLoginDTO.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException("User not found."));
             return jwtService.generateToken(authenticated_user);
         }
         return "Aucun utilisateur trouvé";
