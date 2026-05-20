@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spring Secure API Memory"
+  short_description: "Persist and refresh repo memory by delta"
+  default_prompt: "Use $spring-secure-api-memory to reuse the saved project memory, detect code changes, and refresh the memory incrementally."

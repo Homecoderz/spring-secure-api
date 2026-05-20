@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Memory"
+  short_description: "Persist and refresh repo memory by delta"
+  default_prompt: "Use $repo-memory to bootstrap saved context for this repository, detect deltas, and refresh memory incrementally."

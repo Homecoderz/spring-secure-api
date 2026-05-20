@@ -21,13 +21,18 @@ import java.util.function.Function;
 public class JwtService {
 
     private final SecretKey secretKey;
+    private final long expirationMs;
 
-    public JwtService(@Value("${application.security.jwt.secret}") String jwtSecret) {
+    public JwtService(
+            @Value("${application.security.jwt.secret}") String jwtSecret,
+            @Value("${application.security.jwt.expiration-ms}") long expirationMs
+    ) {
         if (!StringUtils.hasText(jwtSecret)) {
             throw new IllegalStateException("application.security.jwt.secret must be configured");
         }
 
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        this.expirationMs = expirationMs;
     }
 
     public String generateToken(@NonNull User user) {
@@ -40,7 +45,7 @@ public class JwtService {
                 .claims(claims)
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 3600_000))
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getKey())
                 .compact();
     }

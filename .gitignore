@@ -35,3 +35,6 @@ build/
 
 ### Codex local memory ###
 .codex/project-memory/
+
+### Secrets locaux ###
+src/main/resources/application-local.properties

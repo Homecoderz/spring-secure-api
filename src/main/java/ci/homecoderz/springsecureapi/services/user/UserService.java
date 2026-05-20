@@ -1,6 +1,7 @@
 package ci.homecoderz.springsecureapi.services.user;
 import ci.homecoderz.springsecureapi.entities.dto.UserRegistrationDTO;
 import ci.homecoderz.springsecureapi.entities.mapper.UserMapper;
+import ci.homecoderz.springsecureapi.entities.user.RoleAuthority;
 import ci.homecoderz.springsecureapi.entities.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import ci.homecoderz.springsecureapi.repositories.UserRepository;
@@ -46,7 +47,7 @@ public class UserService {
 
         User user = userMapper.toEntity(userRegistrationDTO);
         user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
-        user.setRole("USER");
+        user.setRole(RoleAuthority.USER);
         user.setEnabled(true);
 
         return userRepository.save(user);

@@ -1,5 +1,6 @@
 package ci.homecoderz.springsecureapi.configuration.filters;
 
+import ci.homecoderz.springsecureapi.configuration.security.SecurityErrorResponseWriter;
 import ci.homecoderz.springsecureapi.services.authentication.JwtService;
 import ci.homecoderz.springsecureapi.services.user.CustomUserDetailsService;
 import io.jsonwebtoken.JwtException;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final SecurityErrorResponseWriter errorResponseWriter;
 
 
     @Override
@@ -61,7 +64,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (JwtException | IllegalArgumentException exception) {
             SecurityContextHolder.clearContext();
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalide ou expiré");
+            errorResponseWriter.write(
+                    response,
+                    HttpStatus.UNAUTHORIZED.value(),
+                    "Token invalide ou expiré."
+            );
         }
     }
 }

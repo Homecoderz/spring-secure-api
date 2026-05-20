@@ -29,4 +29,8 @@ public class StudentService {
     public Student store(Student student) {
         return studentRepository.save(student);
     }
+
+    public boolean existsByMatricule(String matricule) {
+        return studentRepository.findByMatricule(matricule).isPresent();
+    }
 }

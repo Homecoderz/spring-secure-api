@@ -1,0 +1,10 @@
+# Copier ce fichier vers application-local.properties (non versionné).
+# Les valeurs ci-dessous sont des exemples : ne pas committer de secrets réels.
+
+spring.datasource.password=change_me
+application.security.jwt.secret=change_me_base64
+
+# Générer une clé JWT Base64 (PowerShell) :
+# $bytes = New-Object byte[] 64
+# [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+# [Convert]::ToBase64String($bytes)
